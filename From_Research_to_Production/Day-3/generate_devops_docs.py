@@ -2,8 +2,6 @@ from openai import OpenAI
 import os
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Задайте API-ключ OpenAI
-
 # Директория для сохранения документов
 OUTPUT_DIR = "./devops-docs"
 

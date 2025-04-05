@@ -70,7 +70,7 @@ def process_document(file_path: str, chunk_size: int = 1000, chunk_overlap: int 
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         length_function=len,  # Використання функції len для визначення довжини тексту
-        separators=["\n\n", "\n", " ", ""]  # Послідовність роздільників для поділу тексту на частини
+        separators=["\n\n", ".", " ", ""]  # Послідовність роздільників для поділу тексту на частини
     )
     # text_splitter.split_documents() розділяє текст на частини, намагаючись максимально використовувати великий роздільник.
     # Спочатку текст розбивається за роздільником "\n\n" (подвійний новий рядок). Якщо після цього частини більші за chunk_size,

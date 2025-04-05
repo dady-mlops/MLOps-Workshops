@@ -6,4 +6,4 @@ backend: aws
 region: us-east-2
 
 # This domain will be used to access the endpoint
-domain: apps.spodarets.com
+domain: gateway.spodarets.com

@@ -3,7 +3,7 @@ import streamlit as st
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain.chains import RetrievalQA
-from langchain_community.vectorstores import Qdrant
+from langchain_qdrant import Qdrant
 import murnitur
 from murnitur import Guard, GuardConfig, log
 from murnitur.guard import RuleSet
@@ -12,8 +12,7 @@ from qdrant_client import QdrantClient
 # Завантаження змінних середовища
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MURNITUR_API_KEY = os.getenv("MURNITUR_API_KEY")
-QDRANT_URL = os.getenv("QDRANT_URL",
-                       "https://3fb2a758-19fe-4158-b88b-41f9259cdcca.europe-west3-0.gcp.cloud.qdrant.io:6333")
+QDRANT_URL = os.getenv("QDRANT_URL", "https://3fb2a758-19fe-4158-b88b-41f9259cdcca.europe-west3-0.gcp.cloud.qdrant.io:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 # Ініціалізація Murnitur
@@ -90,7 +89,6 @@ output_rulesets: list[RuleSet] = [
     },
 ]
 
-
 # Функція для обробки запиту та отримання відповіді від моделі з використанням RAG
 def process_query(query: str, model: ChatOpenAI):
     # Перевірка вхідних даних
@@ -111,7 +109,7 @@ def process_query(query: str, model: ChatOpenAI):
 
     # Отримання відповіді від моделі з використанням RAG
     try:
-        result = qa_chain({"query": query})
+        result = qa_chain.invoke({"query": query})
         response = result['result']
         source_documents = result['source_documents']
 
@@ -135,7 +133,6 @@ def process_query(query: str, model: ChatOpenAI):
 
     return response, False, source_documents
 
-
 # Налаштування Streamlit
 st.set_page_config(page_title="DevOpsLLM Chat з RAG", page_icon="💬")
 st.title("DevOpsLLM Chat з RAG")
@@ -143,7 +140,7 @@ st.title("DevOpsLLM Chat з RAG")
 # Ініціалізація моделі
 model = ChatOpenAI(
     model_name="DevOpsLLM",
-    openai_api_base="https://t5-or-phi-model.apps.spodarets.com/v1",
+    openai_api_base="https://t5-or-phi-model.gateway.spodarets.com/v1",
     openai_api_key="not-needed"
 )
 

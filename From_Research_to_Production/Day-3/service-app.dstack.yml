@@ -1,0 +1,27 @@
+type: service
+
+name: chat
+
+python: "3.11"
+
+env:
+  - HUGGING_FACE_HUB_TOKEN
+  - WANDB_API_KEY
+  - AWS_ACCESS_KEY_ID
+  - AWS_SECRET_ACCESS_KEY
+  - QDRANT_API_KEY
+  - OPENAI_API_KEY
+  - MURNITUR_API_KEY
+commands:
+  - pip install streamlit langchain langchain-openai langchain-qdrant qdrant-client murnitur
+  - streamlit run --server.port 8080  app-rag.py
+
+port: 8080
+
+auth: false
+
+spot_policy: on-demand
+regions: [us-east-2]
+resources:
+  gpu: 0
+  cpu: 4

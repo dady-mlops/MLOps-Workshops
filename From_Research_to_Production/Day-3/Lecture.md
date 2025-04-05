@@ -38,5 +38,10 @@ DNS - add A DNS record for *.<gateway domain>
 - Дашборд
 
 Моніторинг - https://murnitur.ai/
-- рейсінг
+- Тейсінг
 - Демонстріція детекції PII
+
+
+Запуск UI
+streamlit run --server.port 8080  app.py
+streamlit run --server.port 8080  app-rag.py
