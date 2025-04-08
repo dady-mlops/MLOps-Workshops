@@ -1,9 +1,23 @@
 # MLOps-Workshops
 
-Налаштування
+## Перелік воркшопів 
+- [Використання Ray](Ray) - July 16, 2024
+- [Розгортання та моніторинг ML/LLM моделей](Deploy_and_Observability) - August 20, 2024
+- [AI від досліджень до деплою у продакшн (благодійний івент на підтримку Охматдиту)](From_Research_to_Production) - August 27, 2024
+- [CI/CD для Machine Learning, Large Language Models та AI Agents](CI_CD) - April 2, 2025
+
+##Налаштування
 
 Використання віртуального середовища Python
 ```
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Використання віртуального середовища Python з певною версією 
+```
+pyenv install 3.10
+pyenv shell 3.10
 python -m venv .venv
 source .venv/bin/activate
 ```
@@ -15,7 +29,6 @@ sudo installer -pkg AWSCLIV2.pkg -target /
 aws configure
 pip install boto3
 ```
-
 
 Створення локального Kubernetes кластеру
 ```

@@ -1,0 +1,22 @@
+# YOLO Training Configuration
+# Basic settings
+model_type: "yolov8n.pt"
+dataset: "coco8.yaml"
+epochs: 10
+batch_size: 32
+img_size: 640
+
+# Training parameters
+optimizer: "Adam"
+lr0: 0.001
+warmup_epochs: 1.0
+save_period: 1
+
+# W&B integration
+wandb_project: "ci-cd-yolo-training"
+run_name: "yolo-ray-training"       
+
+# Execution settings
+ray_python_path: "python3" 
+auto_install_deps: true  
+show_ray_logs: false  

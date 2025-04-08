@@ -1,0 +1,55 @@
+name: Deploy to SageMaker Serverless Inference
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_path:
+        description: 'Weights & Biases artifact path (entity/project/model)'
+        required: true
+        default: 'dmytro-spodarets/model-registry/cicd-workshop-yolov8'
+      artifact_version:
+        description: 'Artifact version'
+        required: false
+        default: 'v2'
+      endpoint_name:
+        description: 'SageMaker endpoint name'
+        required: false
+        default: 'yolov8-serverless-endpoint'
+     
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          pip install boto3 wandb python-dotenv
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to SageMaker
+        working-directory: CI_CD/sagemaker
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+          WANDB_ENTITY: ${{ secrets.WANDB_ENTITY }}
+          WANDB_PROJECT: ${{ secrets.WANDB_PROJECT }}
+        run: |
+          python deploy_serverless.py --custom-container --artifact-path "${{ github.event.inputs.artifact_path }}" --artifact-version "${{ github.event.inputs.artifact_version }}" --endpoint-name "${{ github.event.inputs.endpoint_name }}"
+
+      - name: Save endpoint info
+        run: |
+          echo "Model deployed to SageMaker Serverless Inference"
+          echo "Check AWS SageMaker console for the endpoint status" 

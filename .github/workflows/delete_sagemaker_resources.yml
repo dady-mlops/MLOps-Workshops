@@ -1,0 +1,65 @@
+name: Delete SageMaker Resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_name:
+        description: 'SageMaker model name to delete (if empty, will use from config)'
+        required: false
+        type: string
+      endpoint_name:
+        description: 'SageMaker endpoint name to delete (if empty, will use from config)'
+        required: false
+        type: string
+      endpoint_config_name:
+        description: 'SageMaker endpoint config name to delete (if empty, will use from config)'
+        required: false
+        type: string
+  
+jobs:
+  delete-resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install boto3 wandb python-dotenv
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Delete SageMaker resources
+        working-directory: CI_CD/sagemaker
+        run: |
+          COMMAND="python delete_sagemaker_resources.py"
+          
+          # Add specific resources if provided
+          if [[ -n "${{ github.event.inputs.model_name }}" ]]; then
+            COMMAND="${COMMAND} --model-name ${{ github.event.inputs.model_name }}"
+          fi
+          
+          if [[ -n "${{ github.event.inputs.endpoint_name }}" ]]; then
+            COMMAND="${COMMAND} --endpoint-name ${{ github.event.inputs.endpoint_name }}"
+          fi
+          
+          if [[ -n "${{ github.event.inputs.endpoint_config_name }}" ]]; then
+            COMMAND="${COMMAND} --endpoint-config-name ${{ github.event.inputs.endpoint_config_name }}"
+          fi
+          
+          echo "Executing: ${COMMAND}"
+          ${COMMAND}
+
+      - name: Completion message
+        run: |
+          echo "SageMaker resources deletion completed" 
