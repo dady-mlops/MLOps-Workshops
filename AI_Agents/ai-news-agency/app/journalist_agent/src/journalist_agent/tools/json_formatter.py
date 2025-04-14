@@ -6,146 +6,125 @@ from pydantic import BaseModel, Field
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("json_formatter")
 
 class ArticleDataInput(BaseModel):
     """
-    Input data schema for formatting article in JSON.
+    Input data schema for formatting an article in JSON.
     
-    Fields:
-    article_title: Article title
-    article_content: Article content
-    article_summary: Brief article description (up to 160 characters)
-    image_url: URL of the generated image
-    image_local_path: Local path to the saved image
-    image_relative_path: Relative path to the saved image
-    image_prompt: Prompt used for image generation
-    linkedin_post: LinkedIn post content
-    twitter_post: Twitter post content
+    Attributes:
+        article_title: Article title
+        article_content: Article content
+        article_summary: Brief article description (up to 160 characters)
+        image_url: URL of the generated image
+        image_local_path: Local path to the saved image
+        image_relative_path: Relative path to the image for display on a web page
+        image_prompt: Prompt used for image generation
+        linkedin_post: LinkedIn post text
+        twitter_post: Twitter/X post text
     """
     article_title: str = Field(..., description="Article title")
-    article_content: str = Field(..., description="Article content")
-    article_summary: str = Field(..., description="Brief article description (up to 160 characters)")
-    image_url: str = Field(..., description="URL of the generated image")
-    image_local_path: str = Field(..., description="Local path to the saved image")
-    image_relative_path: str = Field(..., description="Relative path to the saved image")
+    article_content: str = Field(..., description="Full article text without the title")
+    article_summary: str = Field(..., description="Brief article description (up to 160 characters) for SEO and preview")
+    image_url: str = Field(..., description="URL of the generated DALL-E image")
+    image_local_path: str = Field(..., description="Full path to the saved image")
+    image_relative_path: str = Field(..., description="Relative path for display in the web interface")
     image_prompt: str = Field(..., description="Prompt used for image generation")
-    linkedin_post: str = Field(..., description="LinkedIn post content")
-    twitter_post: str = Field(..., description="Twitter post content")
+    linkedin_post: str = Field(..., description="Full LinkedIn post text")
+    twitter_post: str = Field(..., description="Full Twitter/X post text")
 
 class JSONFormatter(BaseTool):
     """
-    Input data schema for formatting article in JSON.
-    
-    Fields:
-    article_title: Article title
-    article_content: Article content
-    article_summary: Brief article description (up to 160 characters)
-    image_url: URL of the generated image
-    image_local_path: Local path to the saved image
-    image_relative_path: Relative path to the saved image
-    image_prompt: Prompt used for image generation
-    linkedin_post: LinkedIn post content
-    twitter_post: Twitter post content
+    Tool for formatting article data into a standardized JSON structure.
+    Ensures that the result will be a valid JSON object in the expected format.
     """
+    name: str = "Format Article JSON"
+    description: str = """
+    Formats article data, images, and social media posts into a standardized JSON structure.
     
-    name = "JSONFormatter"
-    description = "Formats article data into a standardized JSON structure"
+    Use this tool to create a standardized JSON response with:
+    1. Article title and content
+    2. Image information (URL, paths, and generation prompt)
+    3. LinkedIn and Twitter/X post texts
     
-    def _run(self, content: str) -> str:
+    The tool validates all fields for correctness and returns a valid JSON object.
+    """
+    args_schema: type[BaseModel] = ArticleDataInput
+    
+    def _run(
+        self, 
+        article_title: str,
+        article_content: str,
+        article_summary: str,
+        image_url: str, 
+        image_local_path: str, 
+        image_relative_path: str,
+        image_prompt: str,
+        linkedin_post: str,
+        twitter_post: str
+    ) -> str:
         """
-        Formats the provided content into a standardized JSON structure.
+        Formats article data into a standardized JSON structure.
         
         Args:
-            content: Text content to format into JSON
+            article_title: Article title
+            article_content: Article content
+            article_summary: Brief article description (up to 160 characters)
+            image_url: URL of the generated image
+            image_local_path: Local path to the saved image
+            image_relative_path: Relative path to the image for display on a web page
+            image_prompt: Prompt used for image generation
+            linkedin_post: LinkedIn post text
+            twitter_post: Twitter/X post text
             
         Returns:
-            Formatted JSON string
+            String in JSON format with all data organized in the expected structure
         """
         try:
-            # Try to parse if content is already JSON
-            try:
-                data = json.loads(content)
-                logger.info("Content was already in JSON format")
-            except json.JSONDecodeError:
-                # If not JSON, try to extract key information
-                logger.info("Content is not JSON, extracting information")
-                data = self._extract_data_from_text(content)
+            # Create structured JSON object
+            article_data = {
+                "article_title": article_title,
+                "article_content": article_content,
+                "article_summary": article_summary,
+                "image_info": {
+                    "original_url": image_url,
+                    "local_path": image_local_path,
+                    "relative_path": image_relative_path,
+                    "prompt": image_prompt
+                },
+                "social_media": {
+                    "linkedin": linkedin_post,
+                    "twitter": twitter_post
+                }
+            }
             
-            # Ensure all required fields are present
-            required_fields = [
-                'article_title',
-                'article_content',
-                'article_summary',
-                'image_url',
-                'image_local_path',
-                'image_relative_path',
-                'image_prompt',
-                'linkedin_post',
-                'twitter_post'
-            ]
+            # Check summary length
+            if len(article_summary) > 160:
+                logger.warning(f"Article has a summary that is too long: {len(article_summary)} characters (recommended up to 160)")
             
-            # Initialize missing fields with None
-            for field in required_fields:
-                if field not in data:
-                    data[field] = None
-                    logger.warning(f"Field {field} was missing and initialized as None")
+            # Check all required fields
+            for key in ["article_title", "article_content", "article_summary"]:
+                if not article_data[key]:
+                    logger.warning(f"Field {key} is empty or missing")
             
-            # Format the final JSON
-            formatted_json = json.dumps(data, indent=2, ensure_ascii=False)
-            logger.info("Successfully formatted content to JSON")
+            for section in ["image_info", "social_media"]:
+                if not article_data[section] or not isinstance(article_data[section], dict):
+                    logger.warning(f"Section {section} is missing or is not a dictionary")
+                else:
+                    for key in article_data[section]:
+                        if not article_data[section][key]:
+                            logger.warning(f"Field {section}.{key} is empty or missing")
+            
+            # Convert to JSON string
+            formatted_json = json.dumps(article_data, ensure_ascii=False, indent=None)
+            logger.info("JSON successfully formed")
             
             return formatted_json
             
         except Exception as e:
-            error_msg = f"Error formatting JSON: {str(e)}"
-            logger.error(error_msg)
-            return json.dumps({"error": error_msg})
-    
-    def _extract_data_from_text(self, text: str) -> Dict[str, Any]:
-        """
-        Extracts structured data from unstructured text.
-        
-        Args:
-            text: Unstructured text to parse
-            
-        Returns:
-            Dictionary with extracted data
-        """
-        data = {}
-        
-        # Try to find title
-        title_markers = ["Title:", "# ", "Article Title:"]
-        for marker in title_markers:
-            if marker in text:
-                lines = text.split('\n')
-                for line in lines:
-                    if line.strip().startswith(marker):
-                        data['article_title'] = line.replace(marker, '').strip()
-                        break
-                if 'article_title' in data:
-                    break
-        
-        # Try to find content
-        content_markers = ["Content:", "Article Content:", "## Content"]
-        for marker in content_markers:
-            if marker in text:
-                parts = text.split(marker, 1)
-                if len(parts) > 1:
-                    data['article_content'] = parts[1].strip()
-                    break
-        
-        # Try to find summary
-        summary_markers = ["Summary:", "Article Summary:", "TL;DR:"]
-        for marker in summary_markers:
-            if marker in text:
-                lines = text.split('\n')
-                for line in lines:
-                    if line.strip().startswith(marker):
-                        data['article_summary'] = line.replace(marker, '').strip()
-                        break
-                if 'article_summary' in data:
-                    break
-        
-        logger.info(f"Extracted {len(data)} fields from text")
-        return data 
+            logger.error(f"Error formatting JSON: {str(e)}")
+            error_response = {
+                "error": f"Error formatting JSON: {str(e)}",
+                "success": False
+            }
+            return json.dumps(error_response) 
