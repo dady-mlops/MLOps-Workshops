@@ -1,0 +1,74 @@
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+.env 
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distributions and builds
+*.egg-info/
+.installed.cfg
+*.egg
+dist/
+build/
+eggs/
+parts/
+bin/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Log files
+*.log
+logs/
+log/
+
+# Local settings
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Jupyter Notebook files
+.ipynb_checkpoints
+
+# Weights & Biases files
+wandb/
+
+# Temporary files
+tmp/
+temp/
+
+# API keys and confidential information files
+# .env  # Uncomment if you don't want to include .env file in the repository
+
+# Other project-specific files
+node_modules/
+.cache/
+
+# Generated images
+app/static/images/

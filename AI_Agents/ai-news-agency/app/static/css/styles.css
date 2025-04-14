@@ -1,0 +1,164 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* Forms */
+.form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.url-input-container {
+    margin-bottom: 10px;
+}
+
+.url-input-group {
+    margin-bottom: 10px;
+}
+
+/* Article Styles */
+.article-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+}
+
+.article-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #212529;
+}
+
+.article-summary {
+    font-size: 1.2rem;
+    color: #495057;
+    font-style: italic;
+    border-left: 4px solid #007bff;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+}
+
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #343a40;
+}
+
+.article-content p {
+    margin-bottom: 1.5rem;
+}
+
+.article-content h1, 
+.article-content h2, 
+.article-content h3,
+.article-content h4 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.article-preview {
+    white-space: pre-wrap;
+}
+
+.markdown-content {
+    line-height: 1.6;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+    margin-bottom: 1rem;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #ccc;
+    padding-left: 1rem;
+    color: #666;
+    margin: 1rem 0;
+}
+
+.article-image {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    max-height: 500px;
+    object-fit: cover;
+}
+
+/* Social Media Cards */
+.social-content {
+    font-size: 1rem;
+    white-space: pre-wrap;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.copy-btn {
+    transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Footer */
+.footer {
+    margin-top: 3rem;
+    padding: 1.5rem 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Utils */
+.text-break {
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .article-title {
+        font-size: 1.8rem;
+    }
+    
+    .article-content {
+        font-size: 1rem;
+    }
+    
+    .article-container {
+        padding: 15px;
+    }
+}
+
+/* Custom filter for nl2br */
+.nl2br {
+    white-space: pre-line;
+} 

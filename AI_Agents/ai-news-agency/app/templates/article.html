@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.topic }} - News Agency AI{% endblock %}
+
+{% block content %}
+<style>
+    .social-content {
+        line-height: 1.6;
+    }
+    .social-content a {
+        color: #0366d6;
+        text-decoration: none;
+    }
+    .social-content a:hover {
+        text-decoration: underline;
+    }
+    /* Стили для эмодзи */
+    .social-content img.emoji {
+        height: 1em;
+        width: 1em;
+        margin: 0 .05em 0 .1em;
+        vertical-align: -0.1em;
+    }
+    /* Отступы после параграфов */
+    .social-content p {
+        margin-bottom: 1rem;
+    }
+    /* Стили для источников статей */
+    .article-content strong, .social-content strong {
+        font-weight: 600;
+        color: #24292e;
+    }
+    .article-content a, .social-content a {
+        color: #0366d6;
+        text-decoration: none;
+    }
+    .article-content a:hover, .social-content a:hover {
+        text-decoration: underline;
+    }
+    /* Отступ для метаданных статей (автор, дата публикации и т.д.) */
+    .article-content p:has(strong) {
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<div class="container article-container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Article</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="article-title">{{ article.title or article.topic }}</h1>
+                <div class="d-flex">
+                    <a href="{{ url_for('regenerate_article', article_id=article.id) }}" class="btn btn-outline-primary btn-sm me-2">
+                        <i class="fas fa-sync"></i> Regenerate
+                    </a>
+                    <form action="{{ url_for('delete_article', article_id=article.id) }}" method="post" 
+                          onsubmit="return confirm('Are you sure you want to delete this article?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% if article.summary %}
+            <div class="article-summary my-3">
+                <p class="lead">{{ article.summary }}</p>
+            </div>
+            {% endif %}
+            <p class="text-muted">
+                Topic: {{ article.topic }} | Created: {{ article.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                <span class="ms-3 badge {% if article.status == 'pending' %}bg-warning{% elif article.status == 'processing' %}bg-info{% elif article.status == 'completed' %}bg-success{% else %}bg-danger{% endif %}">
+                    Status: {{ article.status|capitalize }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    {% if article.status == 'pending' or article.status == 'processing' %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <p><i class="fas fa-spinner fa-spin"></i> Your article is being generated. This may take a few minutes.</p>
+                <p>This page will refresh automatically every 30 seconds.</p>
+                <div class="progress mt-2">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {% if article.status == 'pending' %}25%{% else %}75%{% endif %}"></div>
+                </div>
+                <script>
+                    setTimeout(function() {
+                        location.reload();
+                    }, 30000);
+                </script>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if article.status == 'error' %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="alert alert-danger">
+                <p><i class="fas fa-exclamation-triangle"></i> An error occurred while generating your article.</p>
+                <p>Please try again by clicking the "Regenerate" button or contact support if the problem persists.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if article.image_path %}
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <img src="{{ url_for('static', filename=article.image_path) }}" class="img-fluid article-image" alt="Article image">
+            {% if article.image_prompt %}
+            <div class="mt-2 text-muted">
+                <small><strong>Image prompt:</strong> {{ article.image_prompt }}</small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="article-content">
+                {% if article.status == 'pending' or article.status == 'processing' %}
+                    <div class="text-center my-5 py-5">
+                        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h3 class="mt-3">Creating your article...</h3>
+                        <p class="text-muted">Our AI agents are hard at work analyzing sources and crafting your article.</p>
+                        <p class="small text-muted">Status: {{ article.status|capitalize }}</p>
+                    </div>
+                {% else %}
+                    {{ article.content|safe }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {% if article.linkedin_post or article.twitter_post %}
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3 class="mb-4">Social Media Posts</h3>
+        </div>
+        
+        {% if article.linkedin_post %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fab fa-linkedin"></i> LinkedIn Post</h5>
+                    <button class="btn btn-sm btn-outline-primary copy-btn" data-content="linkedin">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="linkedin-content" class="social-content">
+                        {{ article.linkedin_post|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if article.twitter_post %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fab fa-twitter"></i> Twitter/X Post</h5>
+                    <button class="btn btn-sm btn-outline-primary copy-btn" data-content="twitter">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="twitter-content" class="social-content">
+                        {{ article.twitter_post|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="row mt-4 mb-5">
+        <div class="col-md-12">
+            <h3>Sources</h3>
+            <ul class="list-group">
+                {% for url in article.get_urls() %}
+                <li class="list-group-item">
+                    <a href="{{ url }}" target="_blank" class="text-break">{{ url }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Функция для копирования текста в буфер обмена
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyButtons = document.querySelectorAll('.copy-btn');
+        
+        copyButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const contentType = btn.getAttribute('data-content');
+                let content;
+                
+                if (contentType === 'linkedin') {
+                    content = document.getElementById('linkedin-content').innerText;
+                } else if (contentType === 'twitter') {
+                    content = document.getElementById('twitter-content').innerText;
+                }
+                
+                if (content) {
+                    // Кроссбраузерная функция копирования
+                    copyTextToClipboard(content, btn);
+                }
+            });
+        });
+        
+        // Кроссбраузерное копирование
+        function copyTextToClipboard(text, button) {
+            // Проверяем поддержку современного API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        // Успешное копирование
+                        updateButtonText(button);
+                    })
+                    .catch(err => {
+                        console.error('Ошибка копирования: ', err);
+                        // Резервный метод, если API недоступен
+                        fallbackCopyTextToClipboard(text, button);
+                    });
+            } else {
+                // Используем резервный метод для старых браузеров
+                fallbackCopyTextToClipboard(text, button);
+            }
+        }
+        
+        // Резервный метод копирования через DOM
+        function fallbackCopyTextToClipboard(text, button) {
+            const textArea = document.createElement("textarea");
+            // Настройка элемента textarea
+            textArea.value = text;
+            textArea.style.position = "fixed";  // Вне поля зрения
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                // Выполняем копирование
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    updateButtonText(button);
+                } else {
+                    console.error('Ошибка при выполнении команды copy');
+                }
+            } catch (err) {
+                console.error('Ошибка при копировании текста: ', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        // Обновление текста кнопки
+        function updateButtonText(button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+    });
+</script>
+{% endblock %}

@@ -5,6 +5,8 @@
 - [Розгортання та моніторинг ML/LLM моделей](Deploy_and_Observability) - August 20, 2024
 - [AI від досліджень до деплою у продакшн (благодійний івент на підтримку Охматдиту)](From_Research_to_Production) - August 27, 2024
 - [CI/CD для Machine Learning, Large Language Models та AI Agents](CI_CD) - April 2, 2025
+- [AI-агенти на практиці — від проєктування до продакшена](AI_Agents) - April 9, 2025
+
 
 ##Налаштування
 

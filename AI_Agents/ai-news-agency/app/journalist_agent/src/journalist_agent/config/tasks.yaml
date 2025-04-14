@@ -1,0 +1,169 @@
+url_research_task:
+  description: >
+    Analyze the following URLs and extract key information, facts, and quotes.
+    URLs: {urls}
+    
+    Make sure to identify the most important information and verify its credibility.
+    Be thorough in your analysis, as your research will be used not only for content creation
+    but also for fact-checking the final article. Extract specific facts, statistics, quotes, 
+    and key information that can be verified later.
+    
+    Use the "Analyze URL Content" tool to extract content from these URLs.
+  expected_output: >
+    A detailed analysis of each URL including key facts, quotes, and statistics.
+    The analysis should be structured and include source verification.
+    Ensure that all critical information is clearly identified and can be easily
+    referenced for fact-checking purposes later.
+  agent: url_researcher
+
+content_aggregation_task:
+  description: >
+    Organize and structure the information from the URL analysis.
+    Create a coherent outline that identifies common themes and establishes
+    a clear narrative flow. The topic is: {topic}.
+    
+    Focus on accuracy and ensure all key points from the research are included
+    without distorting the original information.
+  expected_output: >
+    A structured outline of the article with main points, supporting details,
+    and a logical flow. The outline should be optimized for SEO and maintain
+    factual accuracy to the original sources.
+  agent: content_aggregator
+
+writing_task:
+  description: >
+    Create a comprehensive news article based on the structured outline about {topic}.
+    The article should be engaging, factually accurate, and optimized for SEO
+    while maintaining a natural, human-like writing style.
+    
+    Your deliverables:
+    1. ARTICLE TITLE - A concise, SEO-friendly title (max 65 chars)
+    2. ARTICLE SUMMARY - A brief description (max 160 chars) for SEO meta description and social sharing
+    3. FULL ARTICLE - The complete article content
+    
+    Important formatting guidelines:
+    - Use clean text without Markdown formatting symbols (**, ##, etc.)
+    - Structure with clear headings and paragraphs
+    - Use proper capitalization for headings instead of symbols
+    - Format the title centered at the top with proper capitalization
+    - Use proper spacing between paragraphs and sections
+    
+    The article summary is CRITICAL for SEO and engagement. It must:
+    - Accurately reflect the article's main point
+    - Be compelling enough to encourage clicks
+    - Include key topic terms
+    - Stay under 160 characters (required for proper display in search results)
+    
+    Stay true to the facts presented in the original sources and avoid adding
+    unsupported information or making claims not backed by the research.
+  expected_output: >
+    {
+      "title": "Your SEO-friendly article title here",
+      "summary": "Your compelling article summary under 160 characters here",
+      "article": "The complete article content here..."
+    }
+  agent: writer
+
+editing_task:
+  description: >
+    Review and refine the article title, summary, and content to ensure quality, accuracy, and readability.
+    
+    Your primary responsibilities are:
+    1. Verify factual accuracy by comparing the article with the original source information
+    2. Check for and correct any potential hallucinations or unsupported claims
+    3. Improve structure, flow, and readability
+    4. Ensure proper grammar, spelling, and punctuation
+    5. Make sure the article maintains journalistic standards and ethics
+    6. Verify that no Markdown formatting symbols remain in the final text
+    7. Ensure proper visual formatting with clear section breaks and spacing
+    8. Check that the article summary:
+       - Is under 160 characters (VERY IMPORTANT)
+       - Accurately represents the article
+       - Is compelling and includes key topic terms
+       - Is free of grammar or spelling errors
+    
+    This fact-checking role is critical to maintain the integrity and trustworthiness
+    of our content. Be especially vigilant about verifying quotes, statistics, and key claims.
+  expected_output: >
+    {
+      "title": "The final edited article title",
+      "summary": "The final edited article summary (under 160 characters)",
+      "article": "The final edited article content..."
+    }
+  agent: editor
+
+image_generation_task:
+  description: >
+    Create a compelling image prompt based on the final edited article about {topic}.
+    
+    Your responsibilities:
+    1. Carefully analyze the article's key themes, concepts, and messages
+    2. Create a detailed prompt for DALL-E that will generate an image that:
+       - Visually represents the article's core message
+       - Is professional, appropriate, and relevant
+       - Could be used as a featured image for the article
+       - Avoids common DALL-E prompt issues (like requesting text, logos, etc.)
+    3. Use the DALL-E tool to generate the image based on your prompt
+    4. Return both your prompt and the generated image URL
+    
+    Remember that a good DALL-E prompt includes details about style, composition, 
+    lighting, and atmosphere to get the best result.
+  expected_output: >
+    {
+      "prompt": "The detailed prompt you created for DALL-E",
+      "image_url": "The URL of the generated image",
+      "description": "A brief explanation of why this image is appropriate for the article"
+    }
+  agent: image_generator
+
+social_media_task:
+  description: >
+    Create engaging social media posts for LinkedIn and Twitter/X based on the final edited article about {topic}.
+    
+    Your responsibilities:
+    1. Read and understand the final article
+    2. Create a LinkedIn post (max 3000 characters) that:
+       - Summarizes the key points professionally
+       - Includes relevant hashtags
+       - Encourages professional engagement
+       - Maintains a formal yet engaging tone
+    3. Create a Twitter/X post (max 280 characters) that:
+       - Captures attention with a concise hook
+       - Includes relevant hashtags (limit to 2-3)
+       - Drives curiosity and clicks
+       
+    Both posts should be original and tailored to each platform's unique audience and format.
+  expected_output: >
+    A JSON object containing:
+    1. LinkedIn post (complete text ready to post)
+    2. Twitter/X post (complete text ready to post)
+  agent: social_media_writer
+
+collection_task:
+  description: >
+    Integrate all content components into a complete, publication-ready package.
+    
+    Your responsibilities:
+    1. Collect and verify all components:
+       - Final article title, summary, and content
+       - Generated image URL and prompt used to create it
+       - LinkedIn post
+       - Twitter/X post
+    2. Download the image using the Image Downloader tool
+       (you'll need the article_id: {article_id})
+    3. IMPORTANT: Use the "Format Article JSON" tool to create a properly formatted response
+       This tool will validate your data and return a correctly structured JSON object
+    4. When using the Format Article JSON tool, make sure to include these required fields:
+       - article_title: The final title from the editor
+       - article_content: The final article content from the editor
+       - article_summary: The final summary from the editor (max 160 chars)
+       - image info (URL, paths, prompt)
+       - social media posts
+
+    IMPORTANT: Use ONLY the Format Article JSON tool for your final response.
+    DO NOT try to manually format JSON, as this often leads to parsing errors.
+    The tool will handle all formatting for you.
+  expected_output: >
+    A valid JSON object containing the article title, summary, content, image information, 
+    and social media posts, all formatted according to the required structure.
+  agent: collector

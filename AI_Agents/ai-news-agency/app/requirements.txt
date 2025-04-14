@@ -1,0 +1,36 @@
+# AI and text processing
+crewai
+langchain
+langchain-community
+langchain-core
+langchain-openai
+langchain-google-genai
+crewai-tools
+
+# Web scraping and data processing
+requests
+firecrawl
+
+# Web application
+flask
+flask-sqlalchemy
+flask-login
+werkzeug
+gunicorn
+
+# Database
+psycopg2-binary
+
+# Utilities
+python-dotenv
+pydantic
+numpy
+tqdm
+
+# Additional tools
+google-api-python-client
+google-search-results
+duckduckgo-search
+openai
+wandb
+weave
